@@ -50,6 +50,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     startTyping();
 
+    // Enhanced External Link Handler
+    document.addEventListener('click', function(e) {
+        // Handle all anchor tags
+        if (e.target.tagName === 'A') {
+            const link = e.target;
+            
+            // Check if it's an external link (not a hash link for navigation)
+            if (link.href && !link.href.startsWith('#') && !link.href.includes(window.location.hostname)) {
+                // If target is not set, set it to _blank for external links
+                if (!link.target) {
+                    e.preventDefault();
+                    window.open(link.href, '_blank', 'noopener,noreferrer');
+                }
+            }
+        }
+        
+        // Handle button clicks with URLs
+        if (e.target.classList.contains('project-btn') || e.target.classList.contains('btn')) {
+            const onclickAttr = e.target.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes('location.href')) {
+                e.preventDefault();
+                // Extract URL from location.href
+                const urlMatch = onclickAttr.match(/location\.href=['"]([^'"]+)['"]/);
+                if (urlMatch && urlMatch[1]) {
+                    // Check if it's an external URL
+                    if (urlMatch[1].startsWith('http')) {
+                        window.open(urlMatch[1], '_blank', 'noopener,noreferrer');
+                    } else {
+                        // For internal links like #contact, navigate normally
+                        window.location.href = urlMatch[1];
+                    }
+                }
+            }
+        }
+    });
+
     // Project Filter Functionality
     const tabButtons = document.querySelectorAll('.tab-btn');
     const projectItems = document.querySelectorAll('.project-item');
@@ -244,4 +280,15 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('%c Welcome to My Portfolio! 🚀', 'color: #1F51FF; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(31,81,255,0.3);');
     console.log('%c Looking for a developer? Let\'s connect! 💻', 'color: #0ff; font-size: 14px;');
     console.log('%c Email: harshit.deva3005@gmail.com', 'color: #fff; font-size: 12px;');
+    
+    // Add security attributes to all external links
+    const externalLinks = document.querySelectorAll('a[href^="http"]');
+    externalLinks.forEach(link => {
+        if (!link.hasAttribute('rel')) {
+            link.setAttribute('rel', 'noopener noreferrer');
+        }
+        if (!link.hasAttribute('target')) {
+            link.setAttribute('target', '_blank');
+        }
+    });
 });
